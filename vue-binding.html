@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>vue数据双向绑定</title>
+</head>
+<body>
+   <form class="form">
+      <p>name<input type="text" name="name" class="name"></p>
+      <p>age<input type="text" name="age" class="age"></p>
+   </form>
+</body>
+<script type="text/javascript">
+let form = document.querySelector('.form')
+let person = {
+  _data: {
+    name: '',
+    age: ''
+  }
+}
+// 封装成一个函数，减少重复代码
+// Object.defineProperty(person, 'name', {
+//     get(){
+//       console.log('name被获取')
+//       return person._data.name
+//     },
+//     set(value){
+//       console.log('name被修改')
+//       let name = document.querySelector('.name')
+//       name.value = value
+//       person._data.name = value
+//     }
+// });
+// Object.defineProperty(person, 'age', {
+//     get(){
+//       console.log('age被获取')
+//       return person._data.age
+//     },
+//     set(value){
+//       console.log('age被修改')
+//       let age = document.querySelector('.age')
+//       age.value = value
+//       person._data.age= value
+//     }
+// });
+
+function binding(obj, key) {
+  let dom = document.querySelector(`.${key}`)
+  Object.defineProperty(obj, key, {
+    get() {
+      console.log(`${key}被获取`)
+      return obj._data[key]
+    },
+    set(value) {
+      console.log(`${key}被修改`)
+      dom.value = value
+      obj._data[key]=value
+    }
+  })
+}
+
+for(let key in person._data) {
+  binding(person, key)
+}
+
+form.addEventListener('input', (e)=> {
+   let value = e.target.value
+   let aname = e.target.getAttribute('name')// dom中的name属性
+   person[aname] = value
+   // console.log(value)
+   // console.log(aname)
+})
+</script>
+</html>

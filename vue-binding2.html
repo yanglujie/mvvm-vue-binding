@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>vue数据双向绑定</title>
+</head>
+<body>
+   <!-- <form class="form">
+      <p>name<input type="text" name="name" class="name"></p>
+      <p>age<input type="text" name="age" class="age"></p>
+   </form> -->
+</body>
+<script type="text/javascript">
+// 首先定义一个数据对象，然后通过observer对其进行观测，之后定义了观察者，当有数据变化时，执行相应的方法
+var data = {
+  a: 1,
+  b: {
+    c: 2
+  }
+}
+// observer(data)
+
+// new Watch('a', ()=> {
+//   alert(9)
+// })
+
+
+// 2、需要一个dep 作为依赖收集器，data下每一个属性都有一个唯一的dep对象，在get中收集针对该属性的依赖，在set方法触发收集的依赖
+class Dep {
+  constructor() {
+    this.subs = []
+  }
+  addSub() {
+    this.subs.push(Dep.target)
+  }
+  notify() {
+     for (let watch of this.subs) {
+       watch.fn()
+     }
+  }
+}
+Dep.target = null
+function pushTarget(watch) {
+  Dep.target = watch
+}
+class Watch {
+  constructor (exp, fn) {
+    this.exp = exp
+    this.fn = fn
+    pushTarget(this)
+    data[exp]
+  }
+}
+
+// 1、observer的作用是：将数据对象data属性转换为访问器属性
+class Observer {
+  constructor(data) {
+    this.data = data
+    this.walk(data)
+  }
+  // 遍历data里的值
+  walk(data) {
+    let val
+    for(let key in data) {
+        if (data.hasOwnProperty(key)) {
+          val = data[key]
+          console.log(val)
+          if (typeof val === 'object') {
+            new Observer(val)
+          } else {
+            this.defineVisitor(key, val)
+          }
+        }
+    }
+  }
+  // 将data中的值都设置为访问器属性
+  defineVisitor(key, val) {
+    let dep = new Dep()
+    Object.defineProperty(this.data, key, {
+      configurable: true,
+      enumerable: true,
+      get: function() {
+        console.log('访问了：' + key)
+        dep.addSub()
+        return val
+      },
+      set: function(v) {
+        console.log('你设置了：' + key+ '=' +v)
+        if(typeof v === 'object') {
+          new Observer(v)
+        } 
+        if(v!== val) {
+          dep.notify()
+          val = v
+        }
+      }
+    })
+  }
+}
+
+new Observer(data)
+
+new Watch('a', ()=> {
+  console.log('属性a的依赖1')
+  // console.log(`属性a的值为${data.a}`)
+})
+new Watch('a', ()=> {
+  console.log('属性a的依赖2')
+  // console.log(`属性a的值为${data.a}`)
+})
+new Watch('b.c', ()=> {
+  console.log('属性b.c的依赖1')
+  // console.log(`属性b.c的值为${data.b.c}`)
+})
+// let form = document.querySelector('.form')
+// let person = {
+//   _data: {
+//     name: '',
+//     age: ''
+//   }
+// }
+// 封装成一个函数，减少重复代码
+// Object.defineProperty(person, 'name', {
+//     get(){
+//       console.log('name被获取')
+//       return person._data.name
+//     },
+//     set(value){
+//       console.log('name被修改')
+//       let name = document.querySelector('.name')
+//       name.value = value
+//       person._data.name = value
+//     }
+// });
+// Object.defineProperty(person, 'age', {
+//     get(){
+//       console.log('age被获取')
+//       return person._data.age
+//     },
+//     set(value){
+//       console.log('age被修改')
+//       let age = document.querySelector('.age')
+//       age.value = value
+//       person._data.age= value
+//     }
+// });
+//使用_data做数据劫持
+// function binding(obj, key) {
+//   let dom = document.querySelector(`.${key}`)
+//   Object.defineProperty(obj, key, {
+//     get() {
+//       console.log(`${key}被获取`)
+//       return obj._data[key]
+//     },
+//     set(value) {
+//       console.log(`${key}被修改`)
+//       dom.value = value
+//       obj._data[key]=value
+//     }
+//   })
+// }
+
+// for(let key in person._data) {
+//   binding(person, key)
+// }
+
+// form.addEventListener('input', (e)=> {
+//    let value = e.target.value
+//    let aname = e.target.getAttribute('name')// dom中的name属性
+//    person[aname] = value
+//    // console.log(value)
+//    // console.log(aname)
+// })
+</script>
+</html>
