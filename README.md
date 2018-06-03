@@ -10,11 +10,11 @@
 
 ### 实现效果：
 
-![Image text](https://github.com/yanglujie/mvvm-vue-binding/raw/master/img/binding.png)
+![Image text](https://github.com/yanglujie/mvvm-vue-binding/raw/master/img/input-binding.png)
 
 #### vue-binding2:
 
 Vue的数据响应系统包含三个部分：Observer、Dep、Watcher
 
-![Image text](https://github.com/yanglujie/mvvm-vue-binding/raw/master/img/input-binding.png)
+![Image text](https://github.com/yanglujie/mvvm-vue-binding/raw/master/img/binding.png)
 
